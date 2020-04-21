@@ -7,6 +7,7 @@ import os
 import events
 from enums import GameState
 from gui import GUI
+from src.game_data import GameData
 
 
 class ControlUnit:
@@ -23,7 +24,11 @@ class ControlUnit:
         os.environ['SDL_VIDEO_WINDOW_POS'] = "0,30"
         pygame.init()
         self.screen = pygame.display.set_mode(self.screen_dimensions)
-        self.gui = GUI(self.screen)
+        program_icon = pygame.image.load('res/icon_loop.png')
+        pygame.display.set_icon(program_icon)
+        pygame.display.set_caption("Indefinite Loop")
+        self.game_data = GameData("game_data.json")
+        self.gui = GUI(self.screen, self.game_data)
         # self.map = Map(self.screen)
 
     def game_loop(self):
@@ -49,11 +54,11 @@ class ControlUnit:
                 self.handle_event_main_menu(event)
 
     def handle_event_main_menu(self, event):
-        """Handles all events that need to be handled in the main menu"""
+        """Handles all events that need to be handled in the main menu."""
         mouse = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEMOTION:
             self.gui.check_button_hover(mouse)
         if event.type == pygame.MOUSEBUTTONUP:
             self.gui.click(mouse)
         if event.type == events.START_GAME_MODE_0:
-            print("START!")
+            print("Start level " + str(event.level))
