@@ -10,6 +10,7 @@
 ## Can do
 * Custom level editor
 * Inverse mode
-* Make tiles look a little more different to each other (like in the original game)
-* Choice between simplistic and fancy style
+* Settings
+    + Choice between simplistic and fancy style
+    + Different (selectable) moods for music
 * Some kind of installer / wrapper for easy use on windows
