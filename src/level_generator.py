@@ -139,16 +139,10 @@ def get_map_size(level):
     :type level: int"""
     if level < 5:
         return 5, 5
-    if level < 15:
-        return 10, 10
-    if level < 35:
-        return 20, 20
     if level < 50:
-        return 25, 25
-    if level < 80:
-        return 30, 30
+        return 10, 10
     if level < 100:
-        return 40, 40
+        return 25, 25
     return 50, 50
 
 
