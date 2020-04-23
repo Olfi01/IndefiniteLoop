@@ -35,6 +35,8 @@ class ControlUnit:
     def game_loop(self):
         """Starts the game loop."""
         self.running = True
+        pygame.mixer.music.load("res/purrple-cat-equinox.mp3")
+        pygame.mixer.music.play(-1)
         while self.running:
             self.clock.tick(self.FPS)
             self.render()
