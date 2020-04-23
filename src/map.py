@@ -27,6 +27,7 @@ class Map:
         self.map = pygame.Surface(self.screen.get_size())
         self.background = pygame.Surface(self.screen.get_size())
         self.background.fill(black)
+        self.click_sound = pygame.mixer.Sound("res/snap.wav")
 
     def draw_map(self):
         self.tiles.clear(self.map, self.background)
@@ -39,6 +40,7 @@ class Map:
             return
         for tile in self.tiles:
             if tile.is_pos_on_tile(mouse_pos):
+                self.click_sound.play()
                 if button == 1:
                     tile.rotate_cw()
                 else:

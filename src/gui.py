@@ -34,6 +34,7 @@ class GUI:
         self.main_menu_surface = None
         # 0: Level button, 1: Level down button, 2: Level up button
         self.level_buttons = []
+        self.click_sound = pygame.mixer.Sound("res/click.wav")
 
     def draw_main_menu(self):
         """Draws the main menu onto the screen each frame."""
@@ -92,6 +93,7 @@ class GUI:
         """Notifies the GUI that the mouse has clicked at a certain position."""
         for button in self.enabled_buttons():  # type: Button
             if button.is_position_on_button(mouse_pos):
+                self.click_sound.play()
                 button.click()
 
     def level_down(self):
