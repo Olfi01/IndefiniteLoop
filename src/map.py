@@ -30,6 +30,7 @@ class Map:
 
     def draw_map(self):
         self.tiles.clear(self.map, self.background)
+        self.tiles.update()
         self.tiles.draw(self.map)
         self.screen.blit(self.map, (0, 0))
 

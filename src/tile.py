@@ -4,6 +4,9 @@ from enums import TileType
 import pygame
 
 
+TURN_SPEED = 10  # 90 NEEDS to be divisible by this, or else the animation will bug
+
+
 class Tile(Sprite):
     """Represents one tile on the game map."""
     def __init__(self, tile_type, rotation, shape, pos, grid_pos):
@@ -19,19 +22,29 @@ class Tile(Sprite):
         Sprite.__init__(self)
         self.tile_type = tile_type
         self.rotation = rotation
+        self.animated_rotation = self.rotation * 90
         self.shape = shape
         self.pos = pos
         self.grid_pos = grid_pos
-        self.image = get_image_for(self.tile_type, self.rotation, self.shape)
+        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape)
         self.rect = self.image.get_rect()
         self.rect.x = self.pos[0]
         self.rect.y = self.pos[1]
+        self.animation_running = 0
+
+    def update(self):
+        if self.animation_running != 0:
+            step = TURN_SPEED * (self.animation_running / abs(self.animation_running))
+            self.animated_rotation += step
+            self.animation_running -= step
+            self.update_image()
 
     def rotate_cw(self):
         """Rotates the sprite clockwise by 90 degrees."""
         self.rotation -= 1
         if self.rotation < 0:
             self.rotation = 3
+        self.animation_running -= 90
         self.update_image()
 
     def rotate_ccw(self):
@@ -39,14 +52,15 @@ class Tile(Sprite):
         self.rotation += 1
         if self.rotation > 3:
             self.rotation = 0
+        self.animation_running += 90
         self.update_image()
 
     def update_image(self):
         """Updates the image of the sprite."""
-        self.image = get_image_for(self.tile_type, self.rotation, self.shape)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.pos[0]
-        self.rect.y = self.pos[1]
+        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape)
+        self.rect = self.image.get_rect()   # type: pygame.Rect
+        self.rect.centerx = self.pos[0] + (self.shape[0] / 2)
+        self.rect.centery = self.pos[1] + (self.shape[1] / 2)
 
     def is_pos_on_tile(self, pos):
         """Returns true if the given position is on this tile. Used for click recognition."""
@@ -90,7 +104,7 @@ def get_image_for(tile_type, rotation, shape):
             if tile_type not in cached_images:
                 cached_images[tile_type] = load_image(tile_type)
             cached_images[key2] = pygame.transform.scale(cached_images[tile_type], shape)
-        cached_images[key] = pygame.transform.rotate(cached_images[key2], rotation * 90)
+        cached_images[key] = pygame.transform.rotate(cached_images[key2], rotation)
     return cached_images[key]
 
 

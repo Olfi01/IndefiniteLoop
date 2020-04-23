@@ -1,7 +1,6 @@
 ## Must do
 
 ## Should do
-* Animate rotation (smoothly)
 * Smoother level transition
 * Background music
 * Sounds
@@ -13,3 +12,4 @@
 * Inverse mode
 * Make tiles look a little more different to each other (like in the original game)
 * Choice between simplistic and fancy style
+* Some kind of installer / wrapper for easy use on windows
