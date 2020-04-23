@@ -23,3 +23,13 @@ def right_of(image, button, distance):
     :type distance: int"""
     return button.get_position()[0] + button.get_width() + distance, \
         button.get_position()[1] + (button.get_height() // 2) - (image.get_height() // 2)
+
+
+def is_kth_bit_set(n, k):
+    """Returns true if the k-th bit of the number n is set.
+    :type n: int
+    :type k: int"""
+    if n & (1 << (k - 1)):
+        return True
+    else:
+        return False

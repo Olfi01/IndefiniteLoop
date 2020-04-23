@@ -1,6 +1,5 @@
 """A helper class to handle saved game data on the device. Uses JSON encoding to read and write data."""
 import json
-import os.path
 
 
 class GameData:
@@ -25,6 +24,20 @@ class GameData:
         """Returns the maximum unlocked level number"""
         return self.get_or_default("max_level", 1)
 
+    def update_max_level_if_higher(self, lv):
+        """Updates the maximum level number, if the given number is higher than the current one.
+        :type lv: int"""
+        if lv > self.get_max_level():
+            self.set_max_level(lv)
+
+    def set_max_level(self, lv):
+        """Sets the maximum unlocked level number to lv
+        :type lv: int"""
+        if lv > 0:
+            self.set("max_level", lv)
+        else:
+            self.set("max_level", 1)
+
     def get_or_default(self, key, default_value):
         """Generic method to either return a value if it's already present
         or set it to a default value before returning that."""
@@ -32,3 +45,8 @@ class GameData:
             self.data[key] = default_value
         self.save()
         return self.data[key]
+
+    def set(self, key, value):
+        """Sets a value for the given key and saves."""
+        self.data[key] = value
+        self.save()

@@ -7,7 +7,8 @@ import os
 import events
 from enums import GameState
 from gui import GUI
-from src.game_data import GameData
+from game_data import GameData
+from map import Map
 
 
 class ControlUnit:
@@ -29,7 +30,7 @@ class ControlUnit:
         pygame.display.set_caption("Indefinite Loop")
         self.game_data = GameData("game_data.json")
         self.gui = GUI(self.screen, self.game_data)
-        # self.map = Map(self.screen)
+        self.map = Map(self.screen, self.game_data)
 
     def game_loop(self):
         """Starts the game loop."""
@@ -43,6 +44,8 @@ class ControlUnit:
         """Renders what's on the screen, depending on the game state. Calls either the GUI or the Map class."""
         if self.state == GameState.MainMenu:
             self.gui.draw_main_menu()
+        if self.state == GameState.InGameMode0:
+            self.map.draw_map()
         pygame.display.flip()
 
     def run_events(self):
@@ -52,6 +55,8 @@ class ControlUnit:
                 self.running = False
             if self.state == GameState.MainMenu:
                 self.handle_event_main_menu(event)
+            if self.state == GameState.InGameMode0:
+                self.handle_event_in_game(event)
 
     def handle_event_main_menu(self, event):
         """Handles all events that need to be handled in the main menu."""
@@ -61,4 +66,11 @@ class ControlUnit:
         if event.type == pygame.MOUSEBUTTONUP:
             self.gui.click(mouse)
         if event.type == events.START_GAME_MODE_0:
-            print("Start level " + str(event.level))
+            self.state = GameState.InGameMode0
+            self.map.set_level(event.level)
+
+    def handle_event_in_game(self, event):
+        """Handles all events that need to be handled in game."""
+        mouse = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.map.handle_click(mouse, event.button)

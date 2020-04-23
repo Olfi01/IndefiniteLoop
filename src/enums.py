@@ -8,3 +8,12 @@ class GameState(Enum):
     InGameMode0 = 1,
     InLevelEditor = 2,
     InGameMode1 = 3
+
+
+class TileType(Enum):
+    """Represents the type of a tile. Named after the number of connections it has."""
+    One = 0,
+    TwoStraight = 1,
+    TwoCorner = 2,
+    Three = 3,
+    Four = 4

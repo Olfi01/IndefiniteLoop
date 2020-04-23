@@ -8,11 +8,9 @@ from src.button import Button
 from src.game_data import GameData
 from utility import center_horizontally, left_of, right_of
 from text_button import TextButton
+from colors import black, white, red
 
 
-black = (0, 0, 0)
-white = (255, 255, 255)
-red = (255, 40, 40)
 menu_fonts = ["Comic Sans MS", "Segoe Print"]
 arrow_right = pygame.transform.scale(pygame.image.load("res/arrow_right.png"), (30, 30))
 arrow_right_hover = pygame.transform.scale(pygame.image.load("res/arrow_right_hover.png"), (30, 30))
