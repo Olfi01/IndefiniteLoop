@@ -18,6 +18,7 @@ class ImageButton(Button):
         Button.__init__(self, position, on_click, enabled)
 
     def render_image(self):
+        """Returns the image to render, depending on whether it's being hovered or not."""
         if self.hovered:
             return self.image_hovered
         else:

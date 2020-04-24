@@ -52,6 +52,7 @@ class GUI:
         self.main_menu_surface = pygame.Surface(self.screen_dimensions)
         self.main_menu_surface.fill(black)
         self.buttons = []
+        self.level_buttons = []
         level_button = TextButton((0, 450), "Level " + str(self.level), menu_fonts, 30, white, white, lambda: None)
         level_button.center_horizontally(self.screen_dimensions)
         self.level_buttons.append(level_button)
@@ -77,6 +78,7 @@ class GUI:
         self.buttons.append(quit_button)
 
     def draw_title(self):
+        """Draws the title onto the screen"""
         title = text_helper.create_text("Indefinite Loop", menu_fonts, 50, white)
         self.main_menu_surface.blit(title, (center_horizontally(title, self.screen_dimensions), 50))
 
@@ -97,16 +99,19 @@ class GUI:
                 button.click()
 
     def level_down(self):
+        """Sets the currently selected level one level down if possible"""
         if self.level > 1:
             self.level = self.level - 1
             self.update_level_buttons()
 
     def level_up(self):
+        """Sets the currently selected level one level up if possible"""
         if self.level < self.max_level:
             self.level = self.level + 1
             self.update_level_buttons()
 
     def update_level_buttons(self):
+        """Updates the text of the level button to match the level set and disables/enables the arrows if needed."""
         self.level_buttons[0].set_text("Level " + str(self.level))
         if self.level <= 1:
             self.level_buttons[1].disable()
@@ -118,7 +123,9 @@ class GUI:
             self.level_buttons[2].enable()
 
     def enabled_buttons(self):
+        """Filters the buttons to only return the enabled ones. Used to make sure no disabled buttons can be clicked."""
         return filter(lambda x: x.is_enabled(), self.buttons)
 
     def start_game_mode_0(self):
+        """Posts the start game event to the control unit."""
         pygame.event.post(pygame.event.Event(events.START_GAME_MODE_0, {"level": self.level}))

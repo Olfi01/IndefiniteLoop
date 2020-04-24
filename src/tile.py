@@ -33,6 +33,7 @@ class Tile(Sprite):
         self.animation_running = 0
 
     def update(self):
+        """Updates the tile. Used for the rotation animation."""
         if self.animation_running != 0:
             step = TURN_SPEED * (self.animation_running / abs(self.animation_running))
             self.animated_rotation += step
@@ -67,15 +68,16 @@ class Tile(Sprite):
         return self.pos[0] < pos[0] < self.pos[0] + self.shape[0] and self.pos[1] < pos[1] < self.pos[1] + self.shape[1]
 
     def get_tile_as_num(self):
+        """Returns this tile encoded as a number, as explained in level_generator.py"""
         return get_tile_as_num(self.tile_type, self.rotation)
 
 
 tile_info = {
-    TileType.Four: [15, 15, 15, 15],
-    TileType.Three: [14, 7, 11, 13],
-    TileType.TwoStraight: [10, 5, 10, 5],
-    TileType.TwoCorner: [12, 6, 3, 9],
-    TileType.One: [8, 4, 2, 1]
+    TileType.Four: [0b1111, 0b1111, 0b1111, 0b1111],
+    TileType.Three: [0b1110, 0b0111, 0b1011, 0b1101],
+    TileType.TwoStraight: [0b1010, 0b0101, 0b1010, 0b0101],
+    TileType.TwoCorner: [0b1100, 0b0110, 0b0011, 0b1001],
+    TileType.One: [0b1000, 0b0100, 0b0010, 0b0001]
 }
 
 

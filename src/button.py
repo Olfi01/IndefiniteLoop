@@ -80,10 +80,13 @@ class Button:
             and self.get_position()[1] < mouse_pos[1] < self.get_position()[1] + self.get_height()
 
     def disable(self):
+        """Disables the button."""
         self.enabled = False
 
     def enable(self):
+        """Enables the button."""
         self.enabled = True
 
     def is_enabled(self):
+        """Whether the button is enabled."""
         return self.enabled

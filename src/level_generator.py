@@ -34,7 +34,7 @@ def un_solve(level_map):
     for x in range(level_map.shape[0]):
         for y in range(level_map.shape[1]):
             i = (x, y)
-            if level_map[i] == 0 or level_map[i] == 15:
+            if level_map[i] == 0 or level_map[i] == 0b1111:
                 continue    # no need to spin empty tiles or tiles with connections to all sides
             level_map[i] = rotate_random(level_map[i])
     if not is_solved(level_map):
@@ -77,7 +77,7 @@ def rotate(tile, n):
     """Rotates a tile by n steps clockwise. Returns the rotated tile.
     :type tile: int
     :type n: int"""
-    return 15 & (tile << n | tile >> (4 - n))
+    return 0b1111 & (tile << n | tile >> (4 - n))
 
 
 def get_tile(left, up, right, down):

@@ -1,12 +1,17 @@
 """Contains the Map class that represents the in-game screen. Keeps track of the tiles and their rotation.
 Takes care of rendering the in-game screen."""
+import math
 from pygame import Surface
 from game_data import GameData
 from level_generator import generate_level, is_solved
 import pygame
 from enums import TileType
+import tile as tile_module
 from tile import Tile
-from colors import black
+from colors import black, green
+
+
+DONE_ANIM_SPEED = 30
 
 
 class Map:
@@ -28,15 +33,30 @@ class Map:
         self.background = pygame.Surface(self.screen.get_size())
         self.background.fill(black)
         self.click_sound = pygame.mixer.Sound("res/snap.wav")
+        self.done = False
+        self.done_c_rad = - ((90 // tile_module.TURN_SPEED) * DONE_ANIM_SPEED)
+        self.diag = math.sqrt(pow(self.map.get_width(), 2) + pow(self.map.get_height(), 2))
+        self.center = (self.map.get_width() // 2, self.map.get_height() // 2)
 
     def draw_map(self):
+        """Draws the map on the screen each tick"""
         self.tiles.clear(self.map, self.background)
         self.tiles.update()
+        if self.done:
+            if self.done_c_rad < self.diag:
+                self.done_c_rad += DONE_ANIM_SPEED
+            if self.done_c_rad >= 0:
+                pygame.draw.circle(self.map, green, self.center, self.done_c_rad)
         self.tiles.draw(self.map)
         self.screen.blit(self.map, (0, 0))
 
     def handle_click(self, mouse_pos, button):
+        """Handles the click event sent by pygame. Used to rotate the tiles and to advance a level if done."""
         if button != 1 and button != 3:
+            return
+        if self.done:
+            self.set_level(self.level + 1)
+            self.reset_done()
             return
         for tile in self.tiles:
             if tile.is_pos_on_tile(mouse_pos):
@@ -49,13 +69,27 @@ class Map:
                 self.check_level_solved()
 
     def check_level_solved(self):
+        """Checks whether the current level is solved and sets the map to done if it is."""
         if is_solved(self.level_map):
             self.game_data.update_max_level_if_higher(self.level + 1)
-            self.set_level(self.level + 1)
+            self.set_done()
+
+    def set_done(self):
+        """Notifies the map class that the level was completed, but the player didn't advance to the next level yet."""
+        self.done = True
+        success = pygame.mixer.Sound("res/success.wav")
+        success.play()
+
+    def reset_done(self):
+        """Notifies the map class that the player did advance to the next level."""
+        self.done = False
+        self.done_c_rad = - ((90 // tile_module.TURN_SPEED) * DONE_ANIM_SPEED)  # The delay for the success animation
+        # is calculated in a way that it starts when the turn animation of the tile ends
 
     def update_level_map(self):
         """Updates the level map after the level number has been set."""
         self.tiles.empty()
+        self.map.blit(self.background, (0, 0))
         for x in range(self.level_map.shape[0]):
             for y in range(self.level_map.shape[1]):
                 i = (x, y)
@@ -75,21 +109,21 @@ class Map:
 
 
 tile_infos = {
-    1: {"type": TileType.One, "rot": 3},
-    2: {"type": TileType.One, "rot": 2},
-    3: {"type": TileType.TwoCorner, "rot": 2},
-    4: {"type": TileType.One, "rot": 1},
-    5: {"type": TileType.TwoStraight, "rot": 1},
-    6: {"type": TileType.TwoCorner, "rot": 1},
-    7: {"type": TileType.Three, "rot": 1},
-    8: {"type": TileType.One, "rot": 0},
-    9: {"type": TileType.TwoCorner, "rot": 3},
-    10: {"type": TileType.TwoStraight, "rot": 0},
-    11: {"type": TileType.Three, "rot": 2},
-    12: {"type": TileType.TwoCorner, "rot": 0},
-    13: {"type": TileType.Three, "rot": 3},
-    14: {"type": TileType.Three, "rot": 0},
-    15: {"type": TileType.Four, "rot": 0},
+    0b0001: {"type": TileType.One, "rot": 3},
+    0b0010: {"type": TileType.One, "rot": 2},
+    0b0011: {"type": TileType.TwoCorner, "rot": 2},
+    0b0100: {"type": TileType.One, "rot": 1},
+    0b0101: {"type": TileType.TwoStraight, "rot": 1},
+    0b0110: {"type": TileType.TwoCorner, "rot": 1},
+    0b0111: {"type": TileType.Three, "rot": 1},
+    0b1000: {"type": TileType.One, "rot": 0},
+    0b1001: {"type": TileType.TwoCorner, "rot": 3},
+    0b1010: {"type": TileType.TwoStraight, "rot": 0},
+    0b1011: {"type": TileType.Three, "rot": 2},
+    0b1100: {"type": TileType.TwoCorner, "rot": 0},
+    0b1101: {"type": TileType.Three, "rot": 3},
+    0b1110: {"type": TileType.Three, "rot": 0},
+    0b1111: {"type": TileType.Four, "rot": 0},
 }
 
 

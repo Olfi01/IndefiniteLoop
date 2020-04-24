@@ -1,10 +1,10 @@
 ## Must do
+* Comment all methods (docstrings)
 
 ## Should do
-* Smoother level transition
-    + Level complete sound
 * Pause menu in game
 * Clicking on the level button to enter a level number manually
+* Replace resource location strings with centralized constants
 
 ## Can do
 * Custom level editor
