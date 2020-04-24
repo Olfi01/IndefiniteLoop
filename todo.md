@@ -4,7 +4,6 @@
 ## Should do
 * Pause menu in game
 * Clicking on the level button to enter a level number manually
-* Replace resource location strings with centralized constants
 
 ## Can do
 * Custom level editor

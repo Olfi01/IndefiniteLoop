@@ -2,6 +2,7 @@
 from pygame.sprite import Sprite
 from enums import TileType
 import pygame
+import resource_locations as res
 
 
 TURN_SPEED = 10  # 90 NEEDS to be divisible by this, or else the animation will bug
@@ -111,11 +112,11 @@ def get_image_for(tile_type, rotation, shape):
 
 
 base_images = {
-    TileType.One: "res/one.png",
-    TileType.TwoCorner: "res/two_corner.png",
-    TileType.TwoStraight: "res/two_straight.png",
-    TileType.Three: "res/three.png",
-    TileType.Four: "res/four.png"
+    TileType.One: res.IMG_ONE,
+    TileType.TwoCorner: res.IMG_TWO_CORNER,
+    TileType.TwoStraight: res.IMG_TWO_STRAIGHT,
+    TileType.Three: res.IMG_THREE,
+    TileType.Four: res.IMG_FOUR
 }
 
 

@@ -9,6 +9,7 @@ from src.game_data import GameData
 from utility import center_horizontally, left_of, right_of
 from text_button import TextButton
 from colors import black, white, red
+import resource_locations as res
 
 
 menu_fonts = ["Comic Sans MS", "Segoe Print"]
@@ -34,7 +35,7 @@ class GUI:
         self.main_menu_surface = None
         # 0: Level button, 1: Level down button, 2: Level up button
         self.level_buttons = []
-        self.click_sound = pygame.mixer.Sound("res/click.wav")
+        self.click_sound = pygame.mixer.Sound(res.SOUND_CLICK)
 
     def draw_main_menu(self):
         """Draws the main menu onto the screen each frame."""

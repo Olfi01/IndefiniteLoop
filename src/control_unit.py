@@ -9,6 +9,7 @@ from enums import GameState
 from gui import GUI
 from game_data import GameData
 from map import Map
+import resource_locations as res
 
 
 class ControlUnit:
@@ -25,7 +26,7 @@ class ControlUnit:
         os.environ['SDL_VIDEO_WINDOW_POS'] = "0,30"
         pygame.init()
         self.screen = pygame.display.set_mode(self.screen_dimensions)
-        program_icon = pygame.image.load('res/icon_loop.png')
+        program_icon = pygame.image.load(res.ICON_LOOP)
         pygame.display.set_icon(program_icon)
         pygame.display.set_caption("Indefinite Loop")
         self.game_data = GameData("game_data.json")
@@ -35,7 +36,7 @@ class ControlUnit:
     def game_loop(self):
         """Starts the game loop."""
         self.running = True
-        pygame.mixer.music.load("res/purrple-cat-equinox.mp3")
+        pygame.mixer.music.load(res.MUSIC_BACKGROUND)
         pygame.mixer.music.play(-1)
         while self.running:
             self.clock.tick(self.FPS)

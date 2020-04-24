@@ -9,6 +9,7 @@ from enums import TileType
 import tile as tile_module
 from tile import Tile
 from colors import black, green
+import resource_locations as res
 
 
 DONE_ANIM_SPEED = 30
@@ -32,7 +33,7 @@ class Map:
         self.map = pygame.Surface(self.screen.get_size())
         self.background = pygame.Surface(self.screen.get_size())
         self.background.fill(black)
-        self.click_sound = pygame.mixer.Sound("res/snap.wav")
+        self.click_sound = pygame.mixer.Sound(res.SOUND_SNAP)
         self.done = False
         self.done_c_rad = - ((90 // tile_module.TURN_SPEED) * DONE_ANIM_SPEED)
         self.diag = math.sqrt(pow(self.map.get_width(), 2) + pow(self.map.get_height(), 2))
@@ -77,7 +78,7 @@ class Map:
     def set_done(self):
         """Notifies the map class that the level was completed, but the player didn't advance to the next level yet."""
         self.done = True
-        success = pygame.mixer.Sound("res/success.wav")
+        success = pygame.mixer.Sound(res.SOUND_SUCCESS)
         success.play()
 
     def reset_done(self):
