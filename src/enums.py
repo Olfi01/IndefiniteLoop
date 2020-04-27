@@ -7,7 +7,8 @@ class GameState(Enum):
     MainMenu = 0,
     InGameMode0 = 1,
     InLevelEditor = 2,
-    InGameMode1 = 3
+    InGameMode1 = 3,
+    PausedGameMode0 = 4
 
 
 class TileType(Enum):

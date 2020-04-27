@@ -10,6 +10,7 @@ from utility import center_horizontally, left_of, right_of
 from text_button import TextButton
 from colors import black, white, red
 import resource_locations as res
+from pygame import Surface
 
 
 menu_fonts = ["Comic Sans MS", "Segoe Print"]
@@ -24,15 +25,16 @@ class GUI:
     Called from the control unit."""
     def __init__(self, screen, game_data):
         """Initializes the GUI class and the connected surface. Takes the PyGame screen to be used as a parameter.
-        :type screen: pygame.Surface
-        :type game_data: game_data.GameData"""
+        :type screen: Surface
+        :type game_data: GameData"""
         self.buttons = []
-        self.level = 1
+        self.level = 0
         self.max_level = 1
-        self.screen = screen    # type: pygame.Surface
-        self.game_data = game_data  # type: GameData
+        self.screen = screen
+        self.game_data = game_data
         self.screen_dimensions = screen.get_size()
         self.main_menu_surface = None
+        self.pause_menu_surface = None
         # 0: Level button, 1: Level down button, 2: Level up button
         self.level_buttons = []
         self.click_sound = pygame.mixer.Sound(res.SOUND_CLICK)
@@ -47,10 +49,40 @@ class GUI:
             self.main_menu_surface.blit(button.get_rendered_button(), button.get_position())
         self.screen.blit(self.main_menu_surface, (0, 0))
 
+    def draw_pause_menu(self):
+        """Draws the pause menu over the game screen."""
+        if self.pause_menu_surface is None:
+            self.init_pause_menu()
+        self.screen.blit(self.pause_menu_surface, (0, 0))
+        title = text_helper.create_text("Pause", menu_fonts, 50, white)
+        self.screen.blit(title, (center_horizontally(title, self.screen_dimensions), 50))
+        for button in self.buttons:
+            self.screen.blit(button.get_rendered_button(), button.get_position())
+
+    def init_pause_menu(self):
+        """Initializes the pause menu."""
+        self.pause_menu_surface = pygame.Surface(self.screen_dimensions)
+        self.pause_menu_surface.set_alpha(240)
+        self.pause_menu_surface.fill(black)
+        self.main_menu_surface = None
+        self.buttons = []
+        continue_button = TextButton((0, 450), "Continue", menu_fonts, 30, white, red,
+                                     lambda: pygame.event.post(pygame.event.Event(events.EXIT_PAUSE, {})))
+        continue_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(continue_button)
+        main_menu_button = TextButton((0, 500), "Back to main menu", menu_fonts, 30, white, red,
+                                      lambda: pygame.event.post(pygame.event.Event(events.BACK_TO_MAIN_MENU, {})))
+        main_menu_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(main_menu_button)
+        quit_button = self.create_quit_button()
+        self.buttons.append(quit_button)
+
     def init_main_menu_surface(self):
         """Initializes the surface for the main menu, drawing the title and creating the buttons."""
-        self.level = self.max_level = self.game_data.get_max_level()
+        if self.level == 0:
+            self.level = self.max_level = self.game_data.get_max_level()
         self.main_menu_surface = pygame.Surface(self.screen_dimensions)
+        self.pause_menu_surface = None
         self.main_menu_surface.fill(black)
         self.buttons = []
         self.level_buttons = []
@@ -73,10 +105,15 @@ class GUI:
                                   self.start_game_mode_0)
         start_button.center_horizontally(self.screen_dimensions)
         self.buttons.append(start_button)
+        quit_button = self.create_quit_button()
+        self.buttons.append(quit_button)
+
+    def create_quit_button(self):
+        """Creates the quit button. Used by both the init_main_menu and init_pause_menu methods."""
         quit_button = TextButton((0, 550), "Quit", menu_fonts, 30, white, red,
                                  lambda: pygame.event.post(pygame.event.Event(pygame.QUIT, {})))
         quit_button.center_horizontally(self.screen_dimensions)
-        self.buttons.append(quit_button)
+        return quit_button
 
     def draw_title(self):
         """Draws the title onto the screen"""
@@ -85,7 +122,8 @@ class GUI:
 
     def check_button_hover(self, mouse_pos):
         """Notifies the GUI that the mouse has been moved and re-checks
-        whether a button is currently being hovered over"""
+        whether a button is currently being hovered over.
+        :type mouse_pos: tuple"""
         for button in self.buttons:  # type: Button
             if button.is_position_on_button(mouse_pos):
                 button.hover()
@@ -93,20 +131,21 @@ class GUI:
                 button.un_hover()
 
     def click(self, mouse_pos):
-        """Notifies the GUI that the mouse has clicked at a certain position."""
+        """Notifies the GUI that the mouse has clicked at a certain position.
+        :type mouse_pos: tuple"""
         for button in self.enabled_buttons():  # type: Button
             if button.is_position_on_button(mouse_pos):
                 self.click_sound.play()
                 button.click()
 
     def level_down(self):
-        """Sets the currently selected level one level down if possible"""
+        """Sets the currently selected level one level down if possible."""
         if self.level > 1:
             self.level = self.level - 1
             self.update_level_buttons()
 
     def level_up(self):
-        """Sets the currently selected level one level up if possible"""
+        """Sets the currently selected level one level up if possible."""
         if self.level < self.max_level:
             self.level = self.level + 1
             self.update_level_buttons()

@@ -11,6 +11,8 @@ import numpy as np
 def generate_level(level):
     """Generates the level with the given number.
     Returns it as a 2d numpy array containing the tiles represented as explained above.
+    This method could be tested by giving it a random number and checking whether the returned array is a valid level
+    with a valid solution.
     :type level: int"""
     seed = level * 69420   # multiply by 69420 to not have the seeds too close to each other
     random.seed(seed)
@@ -30,7 +32,9 @@ def generate_level(level):
 
 
 def un_solve(level_map):
-    """Randomly spins all the tiles to make the level unsolved."""
+    """Randomly spins all the tiles to make the level unsolved.
+    This method could be tested by giving it a level that is solved,
+    and checking whether the level returned is not solved."""
     for x in range(level_map.shape[0]):
         for y in range(level_map.shape[1]):
             i = (x, y)
@@ -39,6 +43,9 @@ def un_solve(level_map):
             level_map[i] = rotate_random(level_map[i])
     if not is_solved(level_map):
         return level_map
+    # For this method to be infinitely recursive (which would be bad) there would have to be a level without any tiles,
+    # which has a probability of 1/16 to the power of the number of possible tiles in the level, in other words:
+    # Near impossible. Near enough to not go the additional length of handling that case.
     return un_solve(level_map)
 
 

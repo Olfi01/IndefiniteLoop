@@ -2,7 +2,7 @@
 * Comment all methods (docstrings)
 
 ## Should do
-* Pause menu in game
+* How To Play / Controls
 * Clicking on the level button to enter a level number manually
 
 ## Can do
@@ -12,4 +12,7 @@
     + Choice between simplistic and fancy style
     + Different (selectable) moods for music
     + Toggle music + sound effects
-* Some kind of installer / wrapper for easy use on windows
+    + Add them to pause menu as well?
+* Timer / PvP mode
+* Some kind of installer / wrapper for easy use on windows:
+    + https://cyrille.rossant.net/create-a-standalone-windows-installer-for-your-python-application/

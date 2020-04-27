@@ -49,6 +49,9 @@ class ControlUnit:
             self.gui.draw_main_menu()
         if self.state == GameState.InGameMode0:
             self.map.draw_map()
+        if self.state == GameState.PausedGameMode0:
+            self.map.draw_map()
+            self.gui.draw_pause_menu()
         pygame.display.flip()
 
     def run_events(self):
@@ -60,6 +63,8 @@ class ControlUnit:
                 self.handle_event_main_menu(event)
             if self.state == GameState.InGameMode0:
                 self.handle_event_in_game(event)
+            if self.state == GameState.PausedGameMode0:
+                self.handle_event_paused(event)
 
     def handle_event_main_menu(self, event):
         """Handles all events that need to be handled in the main menu."""
@@ -77,3 +82,19 @@ class ControlUnit:
         mouse = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONUP:
             self.map.handle_click(mouse, event.button)
+        if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            self.state = GameState.PausedGameMode0
+
+    def handle_event_paused(self, event):
+        """Handles all events that need to be handled while paused."""
+        mouse = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEMOTION:
+            self.gui.check_button_hover(mouse)
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.gui.click(mouse)
+        if event.type == events.EXIT_PAUSE:
+            self.state = GameState.InGameMode0
+        if event.type == events.BACK_TO_MAIN_MENU:
+            self.state = GameState.MainMenu
+            self.gui.level = self.map.level
+            self.gui.update_level_buttons()
