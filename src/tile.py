@@ -1,6 +1,6 @@
 """Contains the Tile class, which is used to display a single tile on the map"""
 from pygame.sprite import Sprite
-from enums import TileType
+from enums import TileType, GameStyle
 import pygame
 import resource_locations as res
 
@@ -10,7 +10,7 @@ TURN_SPEED = 10  # 90 NEEDS to be divisible by this, or else the animation will 
 
 class Tile(Sprite):
     """Represents one tile on the game map."""
-    def __init__(self, tile_type, rotation, shape, pos, grid_pos):
+    def __init__(self, tile_type, rotation, shape, pos, grid_pos, style):
         """Initializes a new Tile with the given type, rotation and size.
         Rotation can be either 0, 1, 2 or 3.
         Rotation is counted counterclockwise from the original image.
@@ -19,7 +19,8 @@ class Tile(Sprite):
         :type rotation: int
         :type shape: tuple
         :type pos: tuple
-        :type grid_pos: tuple"""
+        :type grid_pos: tuple
+        :type style: GameStyle"""
         Sprite.__init__(self)
         self.tile_type = tile_type
         self.rotation = rotation
@@ -27,7 +28,8 @@ class Tile(Sprite):
         self.shape = shape
         self.pos = pos
         self.grid_pos = grid_pos
-        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape)
+        self.style = style
+        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape, self.style)
         self.rect = self.image.get_rect()
         self.rect.x = self.pos[0]
         self.rect.y = self.pos[1]
@@ -59,7 +61,7 @@ class Tile(Sprite):
 
     def update_image(self):
         """Updates the image of the sprite."""
-        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape)
+        self.image = get_image_for(self.tile_type, self.animated_rotation, self.shape, self.style)
         self.rect = self.image.get_rect()   # type: pygame.Rect
         self.rect.centerx = self.pos[0] + (self.shape[0] / 2)
         self.rect.centery = self.pos[1] + (self.shape[1] / 2)
@@ -92,35 +94,46 @@ def get_tile_as_num(tile_type, rotation):
 cached_images = {}
 
 
-def get_image_for(tile_type, rotation, shape):
+def get_image_for(tile_type, rotation, shape, style):
     """Returns the image for the given tile type, rotation and size.
     Rotation can be either 0, 1, 2 or 3.
     Rotation is counted counterclockwise from the original image.
     Size is the number of pixels the image should be wide and high.
     :type tile_type: TileType
     :type rotation: int
-    :type shape: tuple"""
+    :type shape: tuple
+    :type style: GameStyle"""
     key = (tile_type, rotation, shape)
     if key not in cached_images:
         key2 = (tile_type, 0, shape)
         if key2 not in cached_images:
             if tile_type not in cached_images:
-                cached_images[tile_type] = load_image(tile_type)
+                cached_images[tile_type] = load_image(tile_type, style)
             cached_images[key2] = pygame.transform.scale(cached_images[tile_type], shape)
         cached_images[key] = pygame.transform.rotate(cached_images[key2], rotation)
     return cached_images[key]
 
 
 base_images = {
-    TileType.One: res.IMG_ONE,
-    TileType.TwoCorner: res.IMG_TWO_CORNER,
-    TileType.TwoStraight: res.IMG_TWO_STRAIGHT,
-    TileType.Three: res.IMG_THREE,
-    TileType.Four: res.IMG_FOUR
+    GameStyle.Fancy: {
+        TileType.One: res.IMG_ONE,
+        TileType.TwoCorner: res.IMG_TWO_CORNER,
+        TileType.TwoStraight: res.IMG_TWO_STRAIGHT,
+        TileType.Three: res.IMG_THREE,
+        TileType.Four: res.IMG_FOUR
+    },
+    GameStyle.Simplistic: {
+        TileType.One: res.IMG_ONE,
+        TileType.TwoCorner: res.IMG_TWO_CORNER_S,
+        TileType.TwoStraight: res.IMG_TWO_STRAIGHT_S,
+        TileType.Three: res.IMG_THREE_S,
+        TileType.Four: res.IMG_FOUR_S
+    }
 }
 
 
-def load_image(tile_type):
+def load_image(tile_type, style):
     """Loads the base image for the given tile type.
-    :type tile_type: TileType"""
-    return pygame.image.load(base_images[tile_type])
+    :type tile_type: TileType
+    :type style: GameStyle"""
+    return pygame.image.load(base_images[style][tile_type])

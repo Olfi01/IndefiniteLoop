@@ -1,5 +1,5 @@
 """A package that contains all the enums used by the game."""
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class GameState(Enum):
@@ -18,3 +18,9 @@ class TileType(Enum):
     TwoCorner = 2,
     Three = 3,
     Four = 4
+
+
+class GameStyle(IntEnum):
+    """Represents the style that the game currently uses."""
+    Fancy = 0,
+    Simplistic = 1

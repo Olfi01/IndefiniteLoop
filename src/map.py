@@ -5,7 +5,7 @@ from pygame import Surface
 from game_data import GameData
 from level_generator import generate_level, is_solved
 import pygame
-from enums import TileType
+from enums import TileType, GameStyle
 import tile as tile_module
 from tile import Tile
 from colors import black, green
@@ -97,7 +97,7 @@ class Map:
                 if self.level_map[i] == 0:
                     continue
                 tile = create_tile(self.level_map[i], self.tile_shape,
-                                   (x * self.tile_shape[0], y * self.tile_shape[1]), i)
+                                   (x * self.tile_shape[0], y * self.tile_shape[1]), i, self.game_data.get_style())
                 self.tiles.add(tile)
 
     def set_level(self, level):
@@ -128,11 +128,12 @@ tile_infos = {
 }
 
 
-def create_tile(tile, shape, pos, grid_pos):
+def create_tile(tile, shape, pos, grid_pos, style):
     """Creates a tile corresponding to the given number (which represents a tile as explained in level_generator.py)
     Also takes the shape of the tile declaring width and height.
     :type tile: int
     :type shape: tuple
     :type pos: tuple
-    :type grid_pos: tuple"""
-    return Tile(tile_infos[tile]["type"], tile_infos[tile]["rot"], shape, pos, grid_pos)
+    :type grid_pos: tuple
+    :type style: GameStyle"""
+    return Tile(tile_infos[tile]["type"], tile_infos[tile]["rot"], shape, pos, grid_pos, style)

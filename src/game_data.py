@@ -1,5 +1,6 @@
 """A helper class to handle saved game data on the device. Uses JSON encoding to read and write data."""
 import json
+from enums import GameStyle
 
 
 class GameData:
@@ -37,6 +38,15 @@ class GameData:
             self.set("max_level", lv)
         else:
             self.set("max_level", 1)
+
+    def get_style(self):
+        """Returns the game style that is currently set."""
+        return GameStyle(self.get_or_default("style", int(GameStyle.Fancy)))
+
+    def set_style(self, style):
+        """Sets the game style to the given style.
+        :type style: GameStyle"""
+        self.set("style", int(style))
 
     def get_or_default(self, key, default_value):
         """Generic method to either return a value if it's already present
