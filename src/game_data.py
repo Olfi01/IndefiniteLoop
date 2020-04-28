@@ -41,7 +41,13 @@ class GameData:
 
     def get_style(self):
         """Returns the game style that is currently set."""
-        return GameStyle(self.get_or_default("style", int(GameStyle.Fancy)))
+        style = self.get_or_default("style", 0)
+        if style == int(GameStyle.Fancy):
+            return GameStyle.Fancy
+        elif style == int(GameStyle.Simplistic):
+            return GameStyle.Simplistic
+        else:
+            raise IndexError()
 
     def set_style(self, style):
         """Sets the game style to the given style.

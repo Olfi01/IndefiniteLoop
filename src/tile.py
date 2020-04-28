@@ -103,13 +103,13 @@ def get_image_for(tile_type, rotation, shape, style):
     :type rotation: int
     :type shape: tuple
     :type style: GameStyle"""
-    key = (tile_type, rotation, shape)
+    key = (tile_type, rotation, shape, style)
     if key not in cached_images:
-        key2 = (tile_type, 0, shape)
+        key2 = (tile_type, 0, shape, style)
         if key2 not in cached_images:
-            if tile_type not in cached_images:
-                cached_images[tile_type] = load_image(tile_type, style)
-            cached_images[key2] = pygame.transform.scale(cached_images[tile_type], shape)
+            if (tile_type, style) not in cached_images:
+                cached_images[(tile_type, style)] = load_image(tile_type, style)
+            cached_images[key2] = pygame.transform.scale(cached_images[(tile_type, style)], shape)
         cached_images[key] = pygame.transform.rotate(cached_images[key2], rotation)
     return cached_images[key]
 

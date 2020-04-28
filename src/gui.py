@@ -177,6 +177,7 @@ class GUI:
         self.main_menu_surface = None
         self.pause_menu_surface = None
         self.buttons = []
+        self.settings_buttons = []
         style_button = TextButton((0, 450), get_style_name(self.game_data.get_style()), menu_fonts, 30, white, red,
                                   self.switch_style)
         style_button.center_horizontally(self.screen_dimensions)
