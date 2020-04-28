@@ -10,6 +10,7 @@ import tile as tile_module
 from tile import Tile
 from colors import black, green
 import resource_locations as res
+from music import SoundManager
 
 
 DONE_ANIM_SPEED = 30
@@ -30,6 +31,7 @@ class Map:
         self.tile_shape = (self.screen.get_width() // self.level_map.shape[0],
                            self.screen.get_height() // self.level_map.shape[1])
         self.tiles = pygame.sprite.Group()
+        self.sound = SoundManager(self.game_data)
         self.map = pygame.Surface(self.screen.get_size())
         self.background = pygame.Surface(self.screen.get_size())
         self.background.fill(black)
@@ -61,7 +63,7 @@ class Map:
             return
         for tile in self.tiles:
             if tile.is_pos_on_tile(mouse_pos):
-                self.click_sound.play()
+                self.sound.play_sound(self.click_sound)
                 if button == 1:
                     tile.rotate_cw()
                 else:
@@ -78,8 +80,7 @@ class Map:
     def set_done(self):
         """Notifies the map class that the level was completed, but the player didn't advance to the next level yet."""
         self.done = True
-        success = pygame.mixer.Sound(res.SOUND_SUCCESS)
-        success.play()
+        self.sound.play_sound(pygame.mixer.Sound(res.SOUND_SUCCESS))
 
     def reset_done(self):
         """Notifies the map class that the player did advance to the next level."""

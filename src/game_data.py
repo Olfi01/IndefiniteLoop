@@ -48,6 +48,24 @@ class GameData:
         :type style: GameStyle"""
         self.set("style", int(style))
 
+    def is_music_on(self):
+        """Returns True if the music is currently set to be on."""
+        return self.get_or_default("music", True)
+
+    def set_music_on(self, value):
+        """Sets the music setting to the given boolean value.
+        :type value: bool"""
+        self.set("music", value)
+
+    def is_sound_on(self):
+        """Returns True if the sound is currently set to be on."""
+        return self.get_or_default("sound", True)
+
+    def set_sound_on(self, value):
+        """Sets the sound setting to the given boolean value.
+        :type value: bool"""
+        self.set("sound", value)
+
     def get_or_default(self, key, default_value):
         """Generic method to either return a value if it's already present
         or set it to a default value before returning that."""

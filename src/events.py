@@ -6,3 +6,4 @@ import pygame
 START_GAME_MODE_0 = pygame.USEREVENT + 1
 EXIT_PAUSE = pygame.USEREVENT + 2
 BACK_TO_MAIN_MENU = pygame.USEREVENT + 3
+OPEN_SETTINGS = pygame.USEREVENT + 4

@@ -10,6 +10,8 @@ from gui import GUI
 from game_data import GameData
 from map import Map
 import resource_locations as res
+import music
+from music import SoundManager
 
 
 class ControlUnit:
@@ -32,12 +34,13 @@ class ControlUnit:
         self.game_data = GameData("game_data.json")
         self.gui = GUI(self.screen, self.game_data)
         self.map = Map(self.screen, self.game_data)
+        self.sound = SoundManager(self.game_data)
 
     def game_loop(self):
         """Starts the game loop."""
         self.running = True
-        pygame.mixer.music.load(res.MUSIC_BACKGROUND)
-        pygame.mixer.music.play(-1)
+        music.load_music(res.MUSIC_BACKGROUND)
+        self.sound.play_music()
         while self.running:
             self.clock.tick(self.FPS)
             self.render()
@@ -52,6 +55,8 @@ class ControlUnit:
         if self.state == GameState.PausedGameMode0:
             self.map.draw_map()
             self.gui.draw_pause_menu()
+        if self.state == GameState.SettingsScreen:
+            self.gui.draw_settings_menu()
         pygame.display.flip()
 
     def run_events(self):
@@ -65,17 +70,27 @@ class ControlUnit:
                 self.handle_event_in_game(event)
             if self.state == GameState.PausedGameMode0:
                 self.handle_event_paused(event)
+            if self.state == GameState.SettingsScreen:
+                self.handle_event_settings_screen(event)
 
-    def handle_event_main_menu(self, event):
-        """Handles all events that need to be handled in the main menu."""
-        mouse = pygame.mouse.get_pos()
+    def handle_menu_events(self, event, mouse):
+        """Handles all events that occur in any GUI menu (mouse events mostly)
+        :type event: Event
+        :type mouse: tuple"""
         if event.type == pygame.MOUSEMOTION:
             self.gui.check_button_hover(mouse)
         if event.type == pygame.MOUSEBUTTONUP:
             self.gui.click(mouse)
+
+    def handle_event_main_menu(self, event):
+        """Handles all events that need to be handled in the main menu."""
+        mouse = pygame.mouse.get_pos()
+        self.handle_menu_events(event, mouse)
         if event.type == events.START_GAME_MODE_0:
             self.state = GameState.InGameMode0
             self.map.set_level(event.level)
+        if event.type == events.OPEN_SETTINGS:
+            self.state = GameState.SettingsScreen
 
     def handle_event_in_game(self, event):
         """Handles all events that need to be handled in game."""
@@ -88,13 +103,17 @@ class ControlUnit:
     def handle_event_paused(self, event):
         """Handles all events that need to be handled while paused."""
         mouse = pygame.mouse.get_pos()
-        if event.type == pygame.MOUSEMOTION:
-            self.gui.check_button_hover(mouse)
-        if event.type == pygame.MOUSEBUTTONUP:
-            self.gui.click(mouse)
+        self.handle_menu_events(event, mouse)
         if event.type == events.EXIT_PAUSE:
             self.state = GameState.InGameMode0
         if event.type == events.BACK_TO_MAIN_MENU:
-            self.state = GameState.MainMenu
             self.gui.level = self.map.level
             self.gui.update_level_buttons()
+            self.state = GameState.MainMenu
+
+    def handle_event_settings_screen(self, event):
+        """Handles all events that need to be handled in the settings screen."""
+        mouse = pygame.mouse.get_pos()
+        self.handle_menu_events(event, mouse)
+        if event.type == events.BACK_TO_MAIN_MENU:
+            self.state = GameState.MainMenu

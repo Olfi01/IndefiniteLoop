@@ -23,3 +23,8 @@ class ImageButton(Button):
             return self.image_hovered
         else:
             return self.image
+
+    def set_images(self, image, image_hovered):
+        """Sets the images for this button to the given images."""
+        self.image = image
+        self.image_hovered = image_hovered

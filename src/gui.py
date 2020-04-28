@@ -4,20 +4,62 @@ import pygame
 import text_helper
 import events
 from image_button import ImageButton
-from src.button import Button
-from src.game_data import GameData
+from button import Button
+from game_data import GameData
 from utility import center_horizontally, left_of, right_of
 from text_button import TextButton
 from colors import black, white, red
 import resource_locations as res
 from pygame import Surface
+from enums import GameStyle
+from music import SoundManager
+import music
+
+
+def scale_image_button(src):
+    """Loads the image from the given file path and scales it to the size of an image button"""
+    return pygame.transform.scale(pygame.image.load(src), (30, 30))
 
 
 menu_fonts = ["Comic Sans MS", "Segoe Print"]
-arrow_right = pygame.transform.scale(pygame.image.load("res/arrow_right.png"), (30, 30))
-arrow_right_hover = pygame.transform.scale(pygame.image.load("res/arrow_right_hover.png"), (30, 30))
-arrow_left = pygame.transform.flip(arrow_right, True, False)
-arrow_left_hover = pygame.transform.flip(arrow_right_hover, True, False)
+img_arrow_right = scale_image_button(res.IMG_ARROW_RIGHT)
+img_arrow_right_hover = scale_image_button(res.IMG_ARROW_RIGHT_HOVER)
+img_arrow_left = pygame.transform.flip(img_arrow_right, True, False)
+img_arrow_left_hover = pygame.transform.flip(img_arrow_right_hover, True, False)
+img_music_on = scale_image_button(res.IMG_MUSIC_ON)
+img_music_on_hover = scale_image_button(res.IMG_MUSIC_ON_HOVER)
+img_music_off = scale_image_button(res.IMG_MUSIC_OFF)
+img_music_off_hover = scale_image_button(res.IMG_MUSIC_OFF_HOVER)
+img_sound_on = scale_image_button(res.IMG_SOUND_ON)
+img_sound_on_hover = scale_image_button(res.IMG_SOUND_ON_HOVER)
+img_sound_off = scale_image_button(res.IMG_SOUND_OFF)
+img_sound_off_hover = scale_image_button(res.IMG_SOUND_OFF_HOVER)
+
+
+# Use like this: music_button_images[is_on][is_hover]
+music_button_images = {
+    True: {
+        False: img_music_on,
+        True: img_music_on_hover
+    },
+    False: {
+        False: img_music_off,
+        True: img_music_off_hover
+    }
+}
+
+
+# Use like this: sound_button_images[is_on][is_hover]
+sound_button_images = {
+    True: {
+        False: img_sound_on,
+        True: img_sound_on_hover
+    },
+    False: {
+        False: img_sound_off,
+        True: img_sound_off_hover
+    }
+}
 
 
 class GUI:
@@ -32,12 +74,16 @@ class GUI:
         self.max_level = 1
         self.screen = screen
         self.game_data = game_data
+        self.sound = SoundManager(self.game_data)
         self.screen_dimensions = screen.get_size()
         self.main_menu_surface = None
         self.pause_menu_surface = None
+        self.settings_menu_surface = None
         # 0: Level button, 1: Level down button, 2: Level up button
         self.level_buttons = []
         self.click_sound = pygame.mixer.Sound(res.SOUND_CLICK)
+        # 0: Style button, 1: Music button, 2: Sound button
+        self.settings_buttons = []
 
     def draw_main_menu(self):
         """Draws the main menu onto the screen each frame."""
@@ -59,23 +105,16 @@ class GUI:
         for button in self.buttons:
             self.screen.blit(button.get_rendered_button(), button.get_position())
 
-    def init_pause_menu(self):
-        """Initializes the pause menu."""
-        self.pause_menu_surface = pygame.Surface(self.screen_dimensions)
-        self.pause_menu_surface.set_alpha(240)
-        self.pause_menu_surface.fill(black)
-        self.main_menu_surface = None
-        self.buttons = []
-        continue_button = TextButton((0, 450), "Continue", menu_fonts, 30, white, red,
-                                     lambda: pygame.event.post(pygame.event.Event(events.EXIT_PAUSE, {})))
-        continue_button.center_horizontally(self.screen_dimensions)
-        self.buttons.append(continue_button)
-        main_menu_button = TextButton((0, 500), "Back to main menu", menu_fonts, 30, white, red,
-                                      lambda: pygame.event.post(pygame.event.Event(events.BACK_TO_MAIN_MENU, {})))
-        main_menu_button.center_horizontally(self.screen_dimensions)
-        self.buttons.append(main_menu_button)
-        quit_button = self.create_quit_button()
-        self.buttons.append(quit_button)
+    def draw_settings_menu(self):
+        """Draws the settings menu."""
+        if self.settings_menu_surface is None:
+            self.init_settings_menu()
+        self.settings_menu_surface.fill(black)
+        title = text_helper.create_text("Settings", menu_fonts, 50, white)
+        self.settings_menu_surface.blit(title, (center_horizontally(title, self.screen_dimensions), 50))
+        for button in self.buttons:
+            self.settings_menu_surface.blit(button.get_rendered_button(), button.get_position())
+        self.screen.blit(self.settings_menu_surface, (0, 0))
 
     def init_main_menu_surface(self):
         """Initializes the surface for the main menu, drawing the title and creating the buttons."""
@@ -83,6 +122,7 @@ class GUI:
             self.level = self.max_level = self.game_data.get_max_level()
         self.main_menu_surface = pygame.Surface(self.screen_dimensions)
         self.pause_menu_surface = None
+        self.settings_menu_surface = None
         self.main_menu_surface.fill(black)
         self.buttons = []
         self.level_buttons = []
@@ -90,12 +130,12 @@ class GUI:
         level_button.center_horizontally(self.screen_dimensions)
         self.level_buttons.append(level_button)
         self.buttons.append(level_button)
-        level_down_button = ImageButton(left_of(arrow_left, level_button, 20),
-                                        arrow_left, arrow_left_hover, self.level_down, False)
+        level_down_button = ImageButton(left_of(img_arrow_left, level_button, 20),
+                                        img_arrow_left, img_arrow_left_hover, self.level_down, False)
         self.level_buttons.append(level_down_button)
         self.buttons.append(level_down_button)
-        level_up_button = ImageButton(right_of(arrow_right, level_button, 20),
-                                      arrow_right, arrow_right_hover, self.level_up, False)
+        level_up_button = ImageButton(right_of(img_arrow_right, level_button, 20),
+                                      img_arrow_right, img_arrow_right_hover, self.level_up, False)
         self.level_buttons.append(level_up_button)
         self.update_level_buttons()
         self.buttons.append(level_up_button)
@@ -105,12 +145,60 @@ class GUI:
                                   self.start_game_mode_0)
         start_button.center_horizontally(self.screen_dimensions)
         self.buttons.append(start_button)
-        quit_button = self.create_quit_button()
+        settings_button = TextButton((0, 550), "Settings", menu_fonts, 30, white, red,
+                                     lambda: pygame.event.post(pygame.event.Event(events.OPEN_SETTINGS, {})))
+        settings_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(settings_button)
+        quit_button = self.create_quit_button(600)
         self.buttons.append(quit_button)
 
-    def create_quit_button(self):
-        """Creates the quit button. Used by both the init_main_menu and init_pause_menu methods."""
-        quit_button = TextButton((0, 550), "Quit", menu_fonts, 30, white, red,
+    def init_pause_menu(self):
+        """Initializes the pause menu."""
+        self.pause_menu_surface = pygame.Surface(self.screen_dimensions)
+        self.pause_menu_surface.set_alpha(240)
+        self.pause_menu_surface.fill(black)
+        self.main_menu_surface = None
+        self.settings_menu_surface = None
+        self.buttons = []
+        continue_button = TextButton((0, 450), "Continue", menu_fonts, 30, white, red,
+                                     lambda: pygame.event.post(pygame.event.Event(events.EXIT_PAUSE, {})))
+        continue_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(continue_button)
+        main_menu_button = TextButton((0, 500), "Back to main menu", menu_fonts, 30, white, red,
+                                      lambda: pygame.event.post(pygame.event.Event(events.BACK_TO_MAIN_MENU, {})))
+        main_menu_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(main_menu_button)
+        quit_button = self.create_quit_button(550)
+        self.buttons.append(quit_button)
+
+    def init_settings_menu(self):
+        """Initializes the settings menu."""
+        self.settings_menu_surface = pygame.Surface(self.screen_dimensions)
+        self.main_menu_surface = None
+        self.pause_menu_surface = None
+        self.buttons = []
+        style_button = TextButton((0, 450), get_style_name(self.game_data.get_style()), menu_fonts, 30, white, red,
+                                  self.switch_style)
+        style_button.center_horizontally(self.screen_dimensions)
+        self.settings_buttons.append(style_button)
+        self.buttons.append(style_button)
+        x_center = center_horizontally(pygame.Surface((0, 0)), self.screen_dimensions)
+        music_button = ImageButton((x_center - 50, 510), self.get_music_button_img(), self.get_music_button_img_h(),
+                                   self.toggle_music)
+        self.settings_buttons.append(music_button)
+        self.buttons.append(music_button)
+        sound_button = ImageButton((x_center + 20, 510), self.get_sound_button_img(), self.get_sound_button_img_h(),
+                                   self.toggle_sound)
+        self.settings_buttons.append(sound_button)
+        self.buttons.append(sound_button)
+        main_menu_button = TextButton((0, 550), "Back to main menu", menu_fonts, 30, white, red,
+                                      lambda: pygame.event.post(pygame.event.Event(events.BACK_TO_MAIN_MENU, {})))
+        main_menu_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(main_menu_button)
+
+    def create_quit_button(self, y_pos):
+        """Creates the quit button at the given y_pos. Used by both the init_main_menu and init_pause_menu methods."""
+        quit_button = TextButton((0, y_pos), "Quit", menu_fonts, 30, white, red,
                                  lambda: pygame.event.post(pygame.event.Event(pygame.QUIT, {})))
         quit_button.center_horizontally(self.screen_dimensions)
         return quit_button
@@ -135,7 +223,7 @@ class GUI:
         :type mouse_pos: tuple"""
         for button in self.enabled_buttons():  # type: Button
             if button.is_position_on_button(mouse_pos):
-                self.click_sound.play()
+                self.sound.play_sound(self.click_sound)
                 button.click()
 
     def level_down(self):
@@ -169,3 +257,56 @@ class GUI:
     def start_game_mode_0(self):
         """Posts the start game event to the control unit."""
         pygame.event.post(pygame.event.Event(events.START_GAME_MODE_0, {"level": self.level}))
+
+    def switch_style(self):
+        """Switches through the styles by choosing the next one."""
+        self.game_data.set_style(next_style[self.game_data.get_style()])
+        self.settings_buttons[0].set_text(get_style_name(self.game_data.get_style()))
+
+    def get_music_button_img(self):
+        """Gets the music button image that corresponds to the current setting"""
+        return music_button_images[self.game_data.is_music_on()][False]
+
+    def get_music_button_img_h(self):
+        """Gets the hovered music button image that corresponds to the current setting."""
+        return music_button_images[self.game_data.is_music_on()][True]
+
+    def get_sound_button_img(self):
+        """Gets the sound button image that corresponds to the current setting"""
+        return sound_button_images[self.game_data.is_sound_on()][False]
+
+    def get_sound_button_img_h(self):
+        """Gets the hovered sound button image that corresponds to the current setting."""
+        return sound_button_images[self.game_data.is_sound_on()][True]
+
+    def toggle_music(self):
+        """Toggles the music setting (sets it to off if it's on, sets it to on if it's off)"""
+        self.game_data.set_music_on(not self.game_data.is_music_on())
+        self.settings_buttons[1].set_images(self.get_music_button_img(), self.get_music_button_img_h())
+        if not self.game_data.is_music_on():
+            music.stop_music()
+        else:
+            self.sound.play_music()
+
+    def toggle_sound(self):
+        """Toggles the sound setting (sets it to off if it's on, sets it to on if it's off)"""
+        self.game_data.set_sound_on(not self.game_data.is_sound_on())
+        self.settings_buttons[2].set_images(self.get_sound_button_img(), self.get_sound_button_img_h())
+
+
+next_style = {
+    GameStyle.Fancy: GameStyle.Simplistic,
+    GameStyle.Simplistic: GameStyle.Fancy
+}
+
+
+style_names = {
+    GameStyle.Fancy: "Fancy Style",
+    GameStyle.Simplistic: "Simplistic Style"
+}
+
+
+def get_style_name(style):
+    """Returns the name of the given style.
+    :type style: GameStyle"""
+    return style_names[style]
