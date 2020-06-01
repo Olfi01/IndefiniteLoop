@@ -26,5 +26,6 @@ IMG_SOUND_ON = "res/speaker_on.png"
 IMG_SOUND_ON_HOVER = "res/speaker_on_hover.png"
 IMG_SOUND_OFF = "res/speaker_off.png"
 IMG_SOUND_OFF_HOVER = "res/speaker_off_hover.png"
+IMG_HOW_TO = "res/howto.png"
 
 ICON_LOOP = "res/icon_loop.png"

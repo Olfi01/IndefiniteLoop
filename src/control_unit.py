@@ -57,6 +57,8 @@ class ControlUnit:
             self.gui.draw_pause_menu()
         if self.state == GameState.SettingsScreen:
             self.gui.draw_settings_menu()
+        if self.state == GameState.HowToScreen:
+            self.gui.draw_how_to()
         pygame.display.flip()
 
     def run_events(self):
@@ -72,6 +74,8 @@ class ControlUnit:
                 self.handle_event_paused(event)
             if self.state == GameState.SettingsScreen:
                 self.handle_event_settings_screen(event)
+            if self.state == GameState.HowToScreen:
+                self.handle_event_how_to(event)
 
     def handle_menu_events(self, event, mouse):
         """Handles all events that occur in any GUI menu (mouse events mostly)
@@ -91,6 +95,8 @@ class ControlUnit:
             self.map.set_level(event.level)
         if event.type == events.OPEN_SETTINGS:
             self.state = GameState.SettingsScreen
+        if event.type == events.OPEN_HOW_TO:
+            self.state = GameState.HowToScreen
 
     def handle_event_in_game(self, event):
         """Handles all events that need to be handled in game."""
@@ -116,4 +122,9 @@ class ControlUnit:
         mouse = pygame.mouse.get_pos()
         self.handle_menu_events(event, mouse)
         if event.type == events.BACK_TO_MAIN_MENU:
+            self.state = GameState.MainMenu
+
+    def handle_event_how_to(self, event):
+        """Handles all events in the how-to screen."""
+        if event.type == pygame.MOUSEBUTTONUP or event.type == pygame.KEYUP:
             self.state = GameState.MainMenu

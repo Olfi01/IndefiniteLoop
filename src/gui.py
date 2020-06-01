@@ -116,6 +116,11 @@ class GUI:
             self.settings_menu_surface.blit(button.get_rendered_button(), button.get_position())
         self.screen.blit(self.settings_menu_surface, (0, 0))
 
+    def draw_how_to(self):
+        """Draws the how-to screen."""
+        howto = pygame.image.load(res.IMG_HOW_TO)
+        self.screen.blit(howto, (0, 0))
+
     def init_main_menu_surface(self):
         """Initializes the surface for the main menu, drawing the title and creating the buttons."""
         if self.level == 0:
@@ -149,7 +154,11 @@ class GUI:
                                      lambda: pygame.event.post(pygame.event.Event(events.OPEN_SETTINGS, {})))
         settings_button.center_horizontally(self.screen_dimensions)
         self.buttons.append(settings_button)
-        quit_button = self.create_quit_button(600)
+        how_to_button = TextButton((0, 600), "How to play", menu_fonts, 30, white, red,
+                                   lambda: pygame.event.post(pygame.event.Event(events.OPEN_HOW_TO, {})))
+        how_to_button.center_horizontally(self.screen_dimensions)
+        self.buttons.append(how_to_button)
+        quit_button = self.create_quit_button(650)
         self.buttons.append(quit_button)
 
     def init_pause_menu(self):

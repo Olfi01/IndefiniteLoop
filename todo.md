@@ -6,9 +6,10 @@
 * Clicking on the level button to enter a level number manually
 
 ## Can do
+* Refactor events that change GameState to one event with parameter
 * Custom level editor
 * Inverse mode
-* Add settings to pause menu ?
+* Add settings to pause menu?
 * Different (selectable) moods for music
 * Timer / PvP mode
 * Some kind of installer / wrapper for easy use on windows:

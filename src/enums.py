@@ -9,7 +9,8 @@ class GameState(Enum):
     InLevelEditor = 2,
     InGameMode1 = 3,
     PausedGameMode0 = 4,
-    SettingsScreen = 5
+    SettingsScreen = 5,
+    HowToScreen = 6
 
 
 class TileType(Enum):
